@@ -1,15 +1,13 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
-import { MessageSquare, ThumbsUp, Share2 } from 'lucide-react';
+import { MessageSquare, ThumbsUp, Share } from 'lucide-react';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Textarea } from '@/components/ui/textarea';
-import { Post, User } from '@/types';
+import { Post } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
-import { createComment, getCommentsByPost, likePost } from '@/lib/mockData';
+import { useNavigate } from 'react-router-dom';
 
 interface PostItemProps {
   post: Post;
@@ -18,160 +16,108 @@ interface PostItemProps {
 
 const PostItem: React.FC<PostItemProps> = ({ post, onLike }) => {
   const { user } = useAuth();
-  const [showComments, setShowComments] = useState(false);
-  const [commentText, setCommentText] = useState('');
-  const [comments, setComments] = useState<any[]>([]);
-  const author = post.author as User;
-
-  const getInitials = (name: string) => {
-    return name?.split(' ').map((n) => n[0]).join('').toUpperCase() || '';
+  const navigate = useNavigate();
+  const [likeAnimating, setLikeAnimating] = useState(false);
+  
+  const getInitials = (name: string = '') => {
+    return name.split(' ').map((n) => n[0]).join('').toUpperCase();
   };
-
+  
   const handleLike = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    
+    setLikeAnimating(true);
     onLike(post.id);
+    setTimeout(() => setLikeAnimating(false), 500);
   };
-
-  const toggleComments = () => {
-    setShowComments(!showComments);
-    if (!showComments && comments.length === 0) {
-      loadComments();
+  
+  const handleProfileClick = () => {
+    if (post.author) {
+      navigate(`/profile/${post.author.id}`);
     }
   };
-
-  const loadComments = () => {
-    const postComments = getCommentsByPost(post.id);
-    setComments(postComments);
-  };
-
-  const handleAddComment = () => {
-    if (!user || !commentText.trim()) return;
-    
-    const newComment = createComment(commentText, user.id, post.id);
-    newComment.author = user;
-    setComments([newComment, ...comments]);
-    setCommentText('');
-    loadComments();
-  };
-
+  
   return (
-    <div className="linkedin-card mb-4">
-      <div className="p-4">
-        <div className="flex items-start space-x-3 mb-3">
-          <Link to={`/profile/${author?.id}`}>
+    <Card className="mb-4">
+      <CardContent className="pt-6">
+        <div className="flex items-start space-x-4">
+          <div onClick={handleProfileClick} className="cursor-pointer">
             <Avatar>
-              <AvatarImage src={author?.avatar} />
-              <AvatarFallback>{getInitials(author?.name)}</AvatarFallback>
+              <AvatarImage src={post.author?.avatar} />
+              <AvatarFallback>{getInitials(post.author?.name)}</AvatarFallback>
             </Avatar>
-          </Link>
-          <div>
-            <Link to={`/profile/${author?.id}`} className="font-semibold hover:underline">
-              {author?.name}
-            </Link>
-            {author?.headline && (
-              <p className="text-sm text-gray-500">{author.headline}</p>
-            )}
-            <p className="text-xs text-gray-400">
-              {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
-            </p>
           </div>
-        </div>
-        
-        <div className="mb-3 post-content">{post.content}</div>
-        
-        <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
-          <span>{post.likes} likes</span>
-          <span>{post.comments} comments</span>
-        </div>
-        
-        <Separator className="my-2" />
-        
-        <div className="flex justify-between">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex-1 gap-2"
-            onClick={handleLike}
-          >
-            <ThumbsUp className="h-4 w-4" />
-            <span>Like</span>
-          </Button>
           
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex-1 gap-2"
-            onClick={toggleComments}
-          >
-            <MessageSquare className="h-4 w-4" />
-            <span>Comment</span>
-          </Button>
-          
-          <Button variant="ghost" size="sm" className="flex-1 gap-2">
-            <Share2 className="h-4 w-4" />
-            <span>Share</span>
-          </Button>
-        </div>
-        
-        {showComments && (
-          <div className="mt-4">
-            {user && (
-              <div className="flex space-x-3 mb-4">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={user.avatar} />
-                  <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <Textarea
-                    placeholder="Add a comment..."
-                    className="mb-2"
-                    value={commentText}
-                    onChange={(e) => setCommentText(e.target.value)}
-                  />
-                  <Button 
-                    size="sm" 
-                    onClick={handleAddComment}
-                    disabled={!commentText.trim()}
-                  >
-                    Post
-                  </Button>
-                </div>
+          <div className="flex-1 min-w-0">
+            <div 
+              className="font-semibold hover:underline cursor-pointer"
+              onClick={handleProfileClick}
+            >
+              {post.author?.name}
+            </div>
+            <div className="text-sm text-gray-500 mb-2">
+              {post.author?.headline}
+              {post.author?.headline ? ' • ' : ''}
+              {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
+            </div>
+            
+            {/* Post Content */}
+            <div className="post-content mb-3">{post.content}</div>
+            
+            {/* Post Image (if exists) */}
+            {post.image && (
+              <div className="mt-2 mb-3">
+                <img 
+                  src={post.image} 
+                  alt="Post image" 
+                  className="rounded-lg w-full object-contain max-h-96" 
+                />
               </div>
             )}
             
-            {comments.length > 0 ? (
-              <div className="space-y-4">
-                {comments.map((comment) => (
-                  <div key={comment.id} className="flex space-x-3">
-                    <Link to={`/profile/${comment.author?.id}`}>
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={comment.author?.avatar} />
-                        <AvatarFallback>{getInitials(comment.author?.name)}</AvatarFallback>
-                      </Avatar>
-                    </Link>
-                    <div className="flex-1">
-                      <div className="bg-gray-100 rounded-lg p-3">
-                        <Link
-                          to={`/profile/${comment.author?.id}`}
-                          className="font-semibold hover:underline"
-                        >
-                          {comment.author?.name}
-                        </Link>
-                        <p className="text-sm">{comment.content}</p>
-                      </div>
-                      <div className="text-xs text-gray-500 mt-1">
-                        {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
-                      </div>
-                    </div>
+            {/* Post Stats */}
+            {(post.likes > 0 || post.comments > 0) && (
+              <div className="flex justify-between text-xs text-gray-500 mt-4 pb-2 border-b">
+                {post.likes > 0 && (
+                  <div className="flex items-center">
+                    <span className="inline-flex justify-center items-center w-4 h-4 bg-blue-500 rounded-full mr-1">
+                      <ThumbsUp className="w-2 h-2 text-white" />
+                    </span>
+                    {post.likes}
                   </div>
-                ))}
+                )}
+                {post.comments > 0 && (
+                  <div>{post.comments} comments</div>
+                )}
               </div>
-            ) : (
-              <p className="text-center text-gray-500 text-sm">No comments yet</p>
             )}
           </div>
-        )}
-      </div>
-    </div>
+        </div>
+      </CardContent>
+      
+      <CardFooter className="py-2 flex justify-between border-t">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className={`gap-1 flex-1 ${likeAnimating ? 'text-blue-500' : ''}`}
+          onClick={handleLike}
+        >
+          <ThumbsUp className={`h-4 w-4 ${likeAnimating ? 'text-blue-500 animate-bounce' : ''}`} />
+          Like
+        </Button>
+        <Button variant="ghost" size="sm" className="gap-1 flex-1">
+          <MessageSquare className="h-4 w-4" />
+          Comment
+        </Button>
+        <Button variant="ghost" size="sm" className="gap-1 flex-1">
+          <Share className="h-4 w-4" />
+          Share
+        </Button>
+      </CardFooter>
+    </Card>
   );
 };
 

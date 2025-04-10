@@ -15,6 +15,7 @@ export interface User {
 export interface Post {
   id: string;
   content: string;
+  image?: string | null;
   authorId: string;
   author?: User;
   likes: number;

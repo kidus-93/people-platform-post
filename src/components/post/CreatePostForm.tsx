@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { Image, FileText, Video, Send } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Image, FileText, Video, Send, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
@@ -17,6 +17,8 @@ const CreatePostForm: React.FC<CreatePostFormProps> = ({ onPostCreated }) => {
   const { user } = useAuth();
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [postImage, setPostImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   const getInitials = (name: string = '') => {
@@ -35,9 +37,9 @@ const CreatePostForm: React.FC<CreatePostFormProps> = ({ onPostCreated }) => {
       return;
     }
 
-    if (!content.trim()) {
+    if (!content.trim() && !postImage) {
       toast({
-        description: "Post content cannot be empty",
+        description: "Post content or image is required",
         variant: "destructive",
       });
       return;
@@ -46,8 +48,10 @@ const CreatePostForm: React.FC<CreatePostFormProps> = ({ onPostCreated }) => {
     setIsSubmitting(true);
     
     try {
-      createPost(content, user.id);
+      // Create post with content and image if available
+      createPost(content, user.id, postImage);
       setContent('');
+      setPostImage(null);
       toast({
         description: "Post created successfully",
       });
@@ -60,6 +64,29 @@ const CreatePostForm: React.FC<CreatePostFormProps> = ({ onPostCreated }) => {
       });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        setPostImage(result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
+
+  const removeImage = () => {
+    setPostImage(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
@@ -82,9 +109,42 @@ const CreatePostForm: React.FC<CreatePostFormProps> = ({ onPostCreated }) => {
             />
           </div>
           
+          {postImage && (
+            <div className="relative mt-2 mb-3">
+              <img 
+                src={postImage} 
+                alt="Post preview" 
+                className="rounded-lg w-full max-h-96 object-contain" 
+              />
+              <Button 
+                type="button" 
+                size="icon" 
+                variant="destructive" 
+                className="absolute top-2 right-2 h-8 w-8 rounded-full"
+                onClick={removeImage}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+          
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            className="hidden" 
+            accept="image/*" 
+            onChange={handleFileChange}
+          />
+          
           <div className="flex justify-between items-center mt-3">
             <div className="flex space-x-2">
-              <Button type="button" variant="ghost" size="sm" className="text-gray-500">
+              <Button 
+                type="button" 
+                variant="ghost" 
+                size="sm" 
+                className="text-gray-500"
+                onClick={triggerFileInput}
+              >
                 <Image className="h-4 w-4 mr-1" />
                 <span className="hidden sm:inline">Photo</span>
               </Button>
@@ -100,7 +160,7 @@ const CreatePostForm: React.FC<CreatePostFormProps> = ({ onPostCreated }) => {
             
             <Button 
               type="submit" 
-              disabled={!content.trim() || isSubmitting}
+              disabled={(!content.trim() && !postImage) || isSubmitting}
               className="gap-1"
             >
               {isSubmitting ? 'Posting...' : 'Post'}

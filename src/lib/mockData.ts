@@ -97,11 +97,12 @@ export const getUser = (userId: string): User | null => {
 };
 
 // Post operations
-export const createPost = (content: string, authorId: string): Post => {
+export const createPost = (content: string, authorId: string, image: string | null = null): Post => {
   const id = uuidv4();
   const post: Post = {
     id,
     content,
+    image,
     authorId,
     likes: 0,
     comments: 0,
