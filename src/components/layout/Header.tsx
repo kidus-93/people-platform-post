@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Home, Search, Users, Bell, MessageSquare, Briefcase, User } from 'lucide-react';
+import { Home, Search, Users, Bell, MessageSquare, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -33,7 +33,8 @@ const Header = () => {
       <div className="linkedin-container flex items-center justify-between h-14">
         <div className="flex items-center gap-2 md:gap-4">
           <Link to="/" className="text-primary font-bold text-2xl flex items-center">
-            <span className="bg-primary text-white px-2 py-1 rounded">in</span>
+            <span className="bg-primary text-white px-2 py-1 rounded font-cursive">V</span>
+            <span className="hidden md:inline-block ml-1 font-medium">Voices</span>
           </Link>
           
           <div className="hidden md:flex relative max-w-md w-full">
@@ -51,7 +52,6 @@ const Header = () => {
               <div className="flex items-center space-x-1 md:space-x-6">
                 <NavItem icon={<Home />} label="Home" to="/" />
                 <NavItem icon={<Users />} label="My Network" to="/network" />
-                <NavItem icon={<Briefcase />} label="Jobs" to="/jobs" />
                 <NavItem icon={<MessageSquare />} label="Messaging" to="/messages" />
                 <NavItem icon={<Bell />} label="Notifications" to="/notifications" />
                 

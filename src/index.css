@@ -76,7 +76,7 @@
   }
 }
 
-/* LinkedIn-specific styles */
+/* Voices-specific styles */
 .linkedin-container {
   @apply max-w-6xl mx-auto px-4;
 }
@@ -87,4 +87,9 @@
 
 .post-content {
   @apply whitespace-pre-wrap break-words;
+}
+
+.font-cursive {
+  font-family: 'Brush Script MT', cursive;
+  font-size: 1.5rem;
 }

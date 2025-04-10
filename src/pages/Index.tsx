@@ -56,10 +56,9 @@ const Index = () => {
           ) : (
             <Card>
               <CardContent className="p-4">
-                <p className="font-semibold mb-2">Welcome to your professional community</p>
+                <p className="font-semibold mb-2">Welcome to your voice community</p>
                 <p className="text-sm text-gray-500 mb-4">
-                  Join LinkedIn Clone to connect with professionals and stay updated 
-                  with industry news.
+                  Join Voices to connect with others and share your unique perspective.
                 </p>
                 <button 
                   className="w-full bg-primary text-white py-2 rounded-lg"
