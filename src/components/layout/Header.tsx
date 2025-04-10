@@ -75,8 +75,8 @@ const Header = () => {
                     <DropdownMenuItem onClick={() => navigate(`/profile/${user.id}`)}>
                       View Profile
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/settings')}>
-                      Settings
+                    <DropdownMenuItem onClick={() => navigate('/edit-profile')}>
+                      Edit Profile
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout}>
