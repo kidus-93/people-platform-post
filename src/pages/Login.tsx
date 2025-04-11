@@ -54,7 +54,7 @@ const Login = () => {
         <CardHeader>
           <CardTitle className="text-2xl text-center">Sign In</CardTitle>
           <CardDescription className="text-center">
-            Sign in to your LinkedIn Clone account
+            Sign in to your Voices account
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
@@ -106,7 +106,7 @@ const Login = () => {
             </Button>
             
             <p className="mt-4 text-center text-sm">
-              New to LinkedIn Clone?{' '}
+              New to Voices?{' '}
               <Link to="/register" className="text-primary hover:underline">
                 Join now
               </Link>
