@@ -8,7 +8,7 @@ import {
   createUser as createUserService,
   initializeData
 } from '@/lib/mockData';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface AuthContextType {
   user: User | null;
@@ -79,7 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(newUser);
       toast({
         title: "Registration successful",
-        description: `Welcome to LinkedIn Clone, ${name}!`,
+        description: `Welcome to Voices, ${name}!`,
       });
       return true;
     } catch (error) {
