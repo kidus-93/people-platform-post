@@ -65,7 +65,7 @@ const Register = () => {
     <div className="min-h-[80vh] flex items-center justify-center px-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl text-center">Join LinkedIn Clone</CardTitle>
+          <CardTitle className="text-2xl text-center">Join Voices</CardTitle>
           <CardDescription className="text-center">
             Create an account to connect with professionals
           </CardDescription>
